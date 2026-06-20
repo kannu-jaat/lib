@@ -1,84 +1,99 @@
+📚 Krishna Library Student
 
-<p align="center">
-<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/ytpro.gif' height=150  >
-</p>
-<h1 align=center>YT PRO </h1>
+"Library" (https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1200)
 
-<div align="center">
+🎯 About Project
 
+Krishna Library Student is a student management and attendance system designed for libraries and study centers.
 
-[![Gradle](https://github.com/prateek-chaubey/YTPro/actions/workflows/gradle.yml/badge.svg)](https://github.com/prateek-chaubey/YTPro/actions/workflows/gradle.yml)
-<a href="https://www.jsdelivr.com/package/npm/ytpro?tab=stats" ><img alt="jsDelivr monthly hits badge" src="https://data.jsdelivr.com/v1/package/npm/ytpro/badge"></a>
-<img src=https://img.shields.io/github/downloads/prateek-chaubey/YTPro/total >
+The project includes:
 
-</div>
+- Student Registration
+- Admin Approval System
+- QR Attendance
+- WiFi Verification
+- Attendance History
+- Fee Management
+- Push Notifications
+- Popup Notices
+- Multi Device Login
+- Password Reset Requests
+- App Update Alerts
 
-### Become a Sponsor 
 ---
-> [!TIP]
-> If you like this project, consider [sponsoring](https://github.com/sponsors/prateek-chaubey) to support the author 🌸
+
+🚀 Planned Features
+
+Student App
+
+- Login & Registration
+- Admin Approval
+- QR Attendance
+- WiFi Verification
+- Auto Selfie Verification
+- Attendance History
+- Fee Status
+- UPI QR Payment View
+- Notifications
+- Popup Notices
+- Profile Management
+
+Admin App
+
+- Student Approval
+- Attendance Management
+- Manual Attendance
+- Fee Management
+- Notification System
+- QR Generator
+- WiFi Settings
+- App Update Control
+
 ---
 
-## Download YT PRO
+🛠 Technology Stack
 
-[![Download zip](https://custom-icon-badges.herokuapp.com/badge/-Download-ff0000?style=for-the-badge&logo=download&logoColor=white "Download Apk")](https://nightly.link/prateek-chaubey/YTPro/workflows/gradle/main/YTPRO.zip)
+- HTML
+- CSS
+- JavaScript
+- Firebase Realtime Database
+- Firebase Storage
+- Firebase Cloud Messaging
 
-#### Screenshots
-| | | |
-|:--:|:--:|:--:| 
-|<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/screen3.jpg'  > | <img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/screen2.jpg'  > |<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/screen5.jpg'  > | 
-|<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/screen6.jpg'  > | <img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/screen4.jpg'  > |<img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/screen1.jpg'  > |
+---
 
+📂 Project Structure
 
-## Features
- * <img src='https://raw.githubusercontent.com/prateek-chaubey/YTPro/main/.github/img/gemini-logo-13486188-10900314-unscreen-ezgif.com-crop.gif' height=15 width=15 > Google Gemini
-   * Summarise Vidoes
-   * Customisable prompts and models
- * Video Downloader
- * Shorts Downloader
- * In-built Video and Audio Muxer
- * Thumbnails Downloader
- * Captions Downloader
- * Ads Blocker
- * Minimize Video
- * Picture in Picture Mode
- * Gesture control for Volume and Brightness 
- * Shows Number of Dislikes
- * Background Audio Player
- * Custom Heart feature to save videos without logging into your account
- * Enable / disable media codecs
- * Skip Sponsers
- * Force Zoom
- * Hide Shorts
- * Upto 10x video speed 
- * Minimal APK size
- * Adaptive UI icons
- * Minimal
- * Almost 0 Internal Dependencies
- * Auto Updation of App
+assets/
+├── css/
+├── js/
+├── images/
 
+pages/
+├── login.html
+├── register.html
+├── attendance.html
+├── profile.html
 
-## Gemini Prompt
-The available variables for gemini prompt are
-* `{url}` : The URL of the video
-* `{title}` : Title of the video
-* `{videoId}` : Video Id of the video
+index.html
+README.md
 
-## ToDo
- * Enhance Audio
- * Skip Silence 
- 
+---
 
-### Credits
- * [Sponsor Block](https://github.com/ajayyy/SponsorBlock)
- * [return-youtube-dislike](https://github.com/Anarios/return-youtube-dislike)
- * [YouTube.js](https://github.com/LuanRT/YouTube.js/)
+📌 Project Status
 
-### ❤️Supporters❤️
-[![Stargazers repo roster for @prateek-chaubey/YTPro](http://reporoster.com/stars/dark/prateek-chaubey/YTPro)](https://github.com/prateek-chaubey/YTPro/stargazers)
-     
-[![Forkers repo roster for @prateek-chaubey/YTPro](http://reporoster.com/forks/dark/prateek-chaubey/YTPro)](https://github.com/prateek-chaubey/YTPro/network/members)
+Current Status:
 
+Planning & Development Phase
 
-## Disclaimer 
-This is an educational project aimed at showcasing javascript injection into a webview to enhance productivity.
+---
+
+👨‍💻 Developer
+
+Krishna Library Team
+
+---
+
+📄 License
+
+This project is developed for educational and library management purposes.
