@@ -1,209 +1,77 @@
 package com.google.android.youtube.pro;
 
-import android.app.Activity;
-import android.app.PictureInPictureParams;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Rational;
-import android.view.View;
-import android.view.WindowManager;
-import android.webkit.CookieManager;
 import android.widget.Toast;
-import android.window.OnBackInvokedCallback;
-import android.window.OnBackInvokedDispatcher;
-import android.widget.Button;
+import androidx.appcompat.app.AppCompatActivity;
 
-// Import the separated components
-import com.google.android.youtube.pro.webview.YTProWebView;
-import com.google.android.youtube.pro.webview.YTProWebViewClient;
-import com.google.android.youtube.pro.webview.YTProWebChromeClient;
-import com.google.android.youtube.pro.webview.WebAppInterface;
-import com.google.android.youtube.pro.webview.BinaryStreamManager;
+public class MainActivity extends AppCompatActivity {
 
-import com.google.android.youtube.pro.receivers.MediaCommandReceiver;
-
-public class MainActivity extends Activity {
-
-    public boolean portrait = false;
-    public boolean isPlaying = false;
-    public boolean mediaSession = false;
-    public boolean isPip = false;
-    public boolean dL = false;
-
-    private YTProWebView web;
-    private MediaCommandReceiver broadcastReceiver;
-    private OnBackInvokedCallback backCallback;
-    public BinaryStreamManager streamManager;
-    
-    
+    // SharedPreferences for Auto-Login
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
         
-        SharedPreferences prefs = getSharedPreferences("YTPRO", MODE_PRIVATE);
-        if (!prefs.contains("bgplay")) {
-            prefs.edit().putBoolean("bgplay", true).apply();
-        }
+        // Yeh aapki Welcome Screen (activity_main.xml) ko load karega
+        setContentView(R.layout.activity_main);
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        load(false);
+        // 1. SharedPreferences Initialize karna (Login data save karne ke liye)
+        prefs = getSharedPreferences("LibraryApp", MODE_PRIVATE);
+
+        // 2. Foreground Service Start karna (Background Notifications ke liye)
+        startNotificationService();
+
+        // 3. Check karna ki user pehle se login hai ya nahi
+        checkLoginStatus();
     }
 
-    public void load(boolean dl) {
-              
-        
-        this.dL = dl;
-        web = findViewById(R.id.web);
-        
-        web.getSettings().setJavaScriptEnabled(true);
-        web.getSettings().setSupportZoom(true);
-        web.getSettings().setBuiltInZoomControls(true);
-        web.getSettings().setDisplayZoomControls(false);
-        web.getSettings().setDomStorageEnabled(true);
-        web.getSettings().setDatabaseEnabled(true);
-        web.getSettings().setMediaPlaybackRequiresUserGesture(false); 
-        web.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-
-        CookieManager cookieManager = CookieManager.getInstance();
-        cookieManager.setAcceptCookie(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            cookieManager.setAcceptThirdPartyCookies(web, true);
-        }
-
-        Intent intent = getIntent();
-        String action = intent.getAction();
-        Uri data = intent.getData();
-        String url = "https://m.youtube.com/";
-        if (Intent.ACTION_VIEW.equals(action) && data != null) {
-            url = data.toString();
-        } else if (Intent.ACTION_SEND.equals(action)) {
-            String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-            if (sharedText != null && (sharedText.contains("youtube.com") || sharedText.contains("youtu.be"))) {
-                url = sharedText;
-            }
-        }
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-          web.getSettings().setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-        }
-
-
-        web.addJavascriptInterface(new WebAppInterface(this, web), "Android");
-        web.setWebChromeClient(new YTProWebChromeClient(this, web));
-        web.setWebViewClient(new YTProWebViewClient(this, web));
-        
-        web.loadUrl(url);
-
-        setupReceiver();
-        setupBackNavigation();
-        streamManager = new BinaryStreamManager(web,this);
-        
-        
-    }
-         
-
-   
-
-    private void setupReceiver() {
-        broadcastReceiver = new MediaCommandReceiver(web);
-        if (Build.VERSION.SDK_INT >= 34 && getApplicationInfo().targetSdkVersion >= 34) {
-            registerReceiver(broadcastReceiver, new IntentFilter("TRACKS_TRACKS"), RECEIVER_EXPORTED);
+    // Yeh function humari Notification Service ko zinda rakhega
+    private void startNotificationService() {
+        Intent serviceIntent = new Intent(this, ForegroundService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
         } else {
-            registerReceiver(broadcastReceiver, new IntentFilter("TRACKS_TRACKS"));
+            startService(serviceIntent);
         }
     }
 
-    private void setupBackNavigation() {
-        if (Build.VERSION.SDK_INT >= 33) {
-            OnBackInvokedDispatcher dispatcher = getOnBackInvokedDispatcher();
-            backCallback = new OnBackInvokedCallback() {
-                @Override
-                public void onBackInvoked() {
-                    handleBackPress();
-                }
-            };
-            dispatcher.registerOnBackInvokedCallback(OnBackInvokedDispatcher.PRIORITY_DEFAULT, backCallback);
-        }
-    }
-
-    private void handleBackPress() {
-        if (web.canGoBack()) {
-            web.goBack();
+    // Traffic Police: Decide karega kahan jana hai
+    private void checkLoginStatus() {
+        boolean isLoggedIn = prefs.getBoolean("isLoggedIn", false);
+        
+        if (isLoggedIn) {
+            // Agar login hai, toh seedha Dashboard par bhej do (Aage banayenge)
+            Toast.makeText(this, "Welcome back to Krishna Library!", Toast.LENGTH_SHORT).show();
+            // Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
+            // startActivity(intent);
+            // finish();
         } else {
-            finish();
+            // Agar login nahi hai, toh Login Screen par hi rukne do
+            Toast.makeText(this, "Please Login to continue.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        handleBackPress();
-    }
-
+    // Permission handle karne ke liye (Aage Camera/Scanner me kaam aayega)
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 101) {
+        if (requestCode == 101) { // Camera Permission
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                web.loadUrl("https://m.youtube.com");
+                Toast.makeText(this, "Camera Permission Granted", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(getApplicationContext(), getString(R.string.grant_mic), Toast.LENGTH_SHORT).show();
-            }
-        } else if (requestCode == 1) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                Toast.makeText(getApplicationContext(), getString(R.string.grant_storage), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Camera access is required for QR Scanner", Toast.LENGTH_LONG).show();
             }
         }
     }
-
-    @Override
-    public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
-        web.evaluateJavascript(isInPictureInPictureMode ? "PIPlayer();" : "removePIP();", null);
-        isPip = isInPictureInPictureMode;
-    }
-
-    @Override
-    protected void onUserLeaveHint() {
-        super.onUserLeaveHint();
-        if (Build.VERSION.SDK_INT >= 26 && web.getUrl() != null && web.getUrl().contains("watch")) {
-            if (isPlaying) {
-                try {
-                    isPip = true;
-                    PictureInPictureParams params = new PictureInPictureParams.Builder()
-                            .setAspectRatio(new Rational(portrait ? 9 : 16, portrait ? 16 : 9))
-                            .build();
-                    enterPictureInPictureMode(params);
-                } catch (IllegalStateException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        CookieManager.getInstance().flush();
-    }
-
+    
     @Override
     public void onDestroy() {
         super.onDestroy();
-        stopService(new Intent(getApplicationContext(), ForegroundService.class));
-        if (broadcastReceiver != null) unregisterReceiver(broadcastReceiver);
-        if (Build.VERSION.SDK_INT >= 33 && backCallback != null) {
-            getOnBackInvokedDispatcher().unregisterOnBackInvokedCallback(backCallback);
-        }
-        if (streamManager != null) {
-            streamManager.cleanup();
-        }
+        // Hum service ko stop nahi karenge taaki app band hone ke baad bhi notice aayein
     }
 }
