@@ -21,7 +21,7 @@ public class LoginActivity extends Activity {
 
     private EditText etUsername, etPassword;
     private Button btnLogin;
-    private TextView tvRegister, tvForgotPassword;
+    private TextView tvRegister, tvForgotPassword, tvLoginLibName, tvLoginTagline;
     private SharedPreferences prefs;
 
     @Override
@@ -36,8 +36,14 @@ public class LoginActivity extends Activity {
         btnLogin = findViewById(R.id.btnLogin);
         tvRegister = findViewById(R.id.tvRegister);
         tvForgotPassword = findViewById(R.id.tvForgotPassword);
+        
+        // AppConfig se text set karna
+        tvLoginLibName = findViewById(R.id.tvLoginLibName);
+        tvLoginTagline = findViewById(R.id.tvLoginTagline);
+        
+        if (tvLoginLibName != null) tvLoginLibName.setText(AppConfig.LIBRARY_NAME);
+        if (tvLoginTagline != null) tvLoginTagline.setText(AppConfig.TAGLINE);
 
-        // 🚀 forword to registration screen 
         tvRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -45,7 +51,6 @@ public class LoginActivity extends Activity {
             }
         });
 
-        // Forgot Password Logic
         tvForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -53,7 +58,6 @@ public class LoginActivity extends Activity {
             }
         });
 
-        // Login Check Logic
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -65,6 +69,7 @@ public class LoginActivity extends Activity {
                     return;
                 }
 
+                btnLogin.setText("LOGGING IN..."); // Feedback on click
                 loginUser(username, password);
             }
         });
@@ -76,22 +81,19 @@ public class LoginActivity extends Activity {
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
+                btnLogin.setText("LOGIN"); // Reset text
                 if (snapshot.exists()) {
                     String dbPassword = snapshot.child("password").getValue(String.class);
                     String status = snapshot.child("status").getValue(String.class);
 
                     if (dbPassword != null && dbPassword.equals(password)) {
                         if ("Approved".equals(status)) {
-                            // Login Success - Save to Device
                             prefs.edit().putBoolean("isLoggedIn", true)
                                  .putString("username", username)
                                  .apply();
                             
-                            Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
-                            
-                            // 🚀 RASTA KHUL GAYA: Login Pass Hone Par Dashboard Par Bhejna
                             startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
-                            finish(); // Login screen ko band kar do taaki back aane par dobara na dikhe
+                            finish(); 
                         } else {
                             Toast.makeText(LoginActivity.this, "Account Pending Approval from Admin.", Toast.LENGTH_LONG).show();
                         }
@@ -105,6 +107,7 @@ public class LoginActivity extends Activity {
 
             @Override
             public void onCancelled(DatabaseError error) {
+                btnLogin.setText("LOGIN");
                 Toast.makeText(LoginActivity.this, "Database Error", Toast.LENGTH_SHORT).show();
             }
         });
