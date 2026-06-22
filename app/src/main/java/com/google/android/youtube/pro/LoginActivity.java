@@ -89,8 +89,8 @@ public class LoginActivity extends Activity {
                                  .apply();
                             
                             Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
-                            // startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
-                            // finish();
+                            startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
+                            finish();
                         } else {
                             Toast.makeText(LoginActivity.this, "Account Pending Approval from Admin.", Toast.LENGTH_LONG).show();
                         }
