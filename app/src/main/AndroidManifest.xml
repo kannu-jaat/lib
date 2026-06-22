@@ -40,6 +40,9 @@
             android:name=".LoginActivity" 
             android:exported="false"
             android:screenOrientation="portrait"/>
+        
+        <activity android:name=".RegisterActivity" android:screenOrientation="portrait"/>
+        
 
         <!-- 3. BACKGROUND NOTIFICATION SERVICE -->
         <service
