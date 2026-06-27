@@ -4,7 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Shader;
 import android.os.Bundle;
+import android.text.TextPaint;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,43 +40,45 @@ public class LoginActivity extends Activity {
         btnLogin = findViewById(R.id.btnLogin);
         tvRegister = findViewById(R.id.tvRegister);
         tvForgotPassword = findViewById(R.id.tvForgotPassword);
-        
-        // AppConfig se text set karna
         tvLoginLibName = findViewById(R.id.tvLoginLibName);
         tvLoginTagline = findViewById(R.id.tvLoginTagline);
         
-        if (tvLoginLibName != null) tvLoginLibName.setText(AppConfig.LIBRARY_NAME);
-        if (tvLoginTagline != null) tvLoginTagline.setText(AppConfig.TAGLINE);
+        // 🚀 AppConfig se dynamic values set karna
+        if (tvLoginLibName != null) {
+            tvLoginLibName.setText(AppConfig.LIBRARY_NAME);
+            
+            // 🔥 MAGIC: Text Par Gradient Apply Karna programmatically
+            TextPaint paint = tvLoginLibName.getPaint();
+            float width = paint.measureText(AppConfig.LIBRARY_NAME);
+            
+            Shader textShader = new LinearGradient(0, 0, width, 0,
+                    new int[]{
+                            Color.parseColor("#3B82F6"), // Smooth Blue
+                            Color.parseColor("#8E2DE2")  // Electric Purple
+                    }, null, Shader.TileMode.CLAMP);
+            
+            tvLoginLibName.getPaint().setShader(textShader);
+        }
+        
+        if (tvLoginTagline != null) {
+            tvLoginTagline.setText(AppConfig.TAGLINE);
+        }
 
-        tvRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+        tvRegister.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, RegisterActivity.class)));
+
+        tvForgotPassword.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, ForgotPasswordActivity.class)));
+
+        btnLogin.setOnClickListener(v -> {
+            String username = etUsername.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
+
+            if (username.isEmpty() || password.isEmpty()) {
+                Toast.makeText(LoginActivity.this, "Please enter all details", Toast.LENGTH_SHORT).show();
+                return;
             }
-        });
 
-       tvForgotPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Rasta Khul Gaya: Nayi Forgot Password Activity par bhejega
-                startActivity(new Intent(LoginActivity.this, ForgotPasswordActivity.class));
-            }
-        });
-
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String username = etUsername.getText().toString().trim();
-                String password = etPassword.getText().toString().trim();
-
-                if (username.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, "Please enter all details", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                btnLogin.setText("LOGGING IN..."); // Feedback on click
-                loginUser(username, password);
-            }
+            btnLogin.setText("LOGGING IN...");
+            loginUser(username, password);
         });
     }
 
@@ -82,7 +88,7 @@ public class LoginActivity extends Activity {
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                btnLogin.setText("LOGIN"); // Reset text
+                btnLogin.setText("Login   →");
                 if (snapshot.exists()) {
                     String dbPassword = snapshot.child("password").getValue(String.class);
                     String status = snapshot.child("status").getValue(String.class);
@@ -108,7 +114,7 @@ public class LoginActivity extends Activity {
 
             @Override
             public void onCancelled(DatabaseError error) {
-                btnLogin.setText("LOGIN");
+                btnLogin.setText("Login   →");
                 Toast.makeText(LoginActivity.this, "Database Error", Toast.LENGTH_SHORT).show();
             }
         });
