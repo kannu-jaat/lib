@@ -186,19 +186,19 @@ public class RegisterActivity extends Activity {
         }
     }
 
-    // 4. UPLOAD TO CLOUDINARY (Background Thread - 400 Error Fixed)
+    // 4. UPLOAD TO CLOUDINARY (Background Thread - Slash Error Fixed)
     private void uploadImageToCloudinary() {
         new Thread(() -> {
             try {
                 URL url = new URL("https://api.cloudinary.com/v1_1/" + AppConfig.CLOUDINARY_CLOUD_NAME + "/image/upload");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
-                // JSON ki jagah sabse safe format use kar rahe hain
                 conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                 conn.setDoOutput(true);
 
-                // Space ko hatakar underscore (_) laga denge (e.g. Krishna_Library/Profiles)
-                String safeFolderName = AppConfig.LIBRARY_NAME.replace(" ", "_") + "/Profiles";
+                // 🔥 FIXED: Slash (/) ko Underscore (_) se replace kar diya hai
+                // Ab folder name "Krishna_Library_Profiles" hoga
+                String safeFolderName = AppConfig.LIBRARY_NAME.replace(" ", "_") + "_Profiles";
 
                 // URL Encode format me data bhejna
                 String dataStr = "data:image/jpeg;base64," + base64ImageString;
@@ -225,7 +225,7 @@ public class RegisterActivity extends Activity {
                     // Cloudinary se URL mil gaya, ab Firebase bhejenge
                     runOnUiThread(() -> saveStudentToFirebase(secureUrl));
                 } else {
-                    // Agar 400 error aaya, toh Error Stream padh kar exact reason nikalenge
+                    // Agar koi aur error aaya, toh exact reason nikalenge
                     BufferedReader errorStream = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
                     StringBuilder errorResponse = new StringBuilder();
                     String line;
