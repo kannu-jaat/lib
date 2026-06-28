@@ -186,24 +186,28 @@ public class RegisterActivity extends Activity {
         }
     }
 
-    // 4. UPLOAD TO CLOUDINARY (Background Thread)
+    // 4. UPLOAD TO CLOUDINARY (Background Thread - 400 Error Fixed)
     private void uploadImageToCloudinary() {
         new Thread(() -> {
             try {
                 URL url = new URL("https://api.cloudinary.com/v1_1/" + AppConfig.CLOUDINARY_CLOUD_NAME + "/image/upload");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
-                conn.setRequestProperty("Content-Type", "application/json");
+                // JSON ki jagah sabse safe format use kar rahe hain
+                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                 conn.setDoOutput(true);
 
-                // Cloudinary Config
-                JSONObject jsonParam = new JSONObject();
-                jsonParam.put("upload_preset", AppConfig.CLOUDINARY_UPLOAD_PRESET);
-                jsonParam.put("file", "data:image/jpeg;base64," + base64ImageString);
-                jsonParam.put("folder", AppConfig.LIBRARY_NAME + "/Profiles");
+                // Space ko hatakar underscore (_) laga denge (e.g. Krishna_Library/Profiles)
+                String safeFolderName = AppConfig.LIBRARY_NAME.replace(" ", "_") + "/Profiles";
+
+                // URL Encode format me data bhejna
+                String dataStr = "data:image/jpeg;base64," + base64ImageString;
+                String postParameters = "upload_preset=" + java.net.URLEncoder.encode(AppConfig.CLOUDINARY_UPLOAD_PRESET, "UTF-8")
+                        + "&folder=" + java.net.URLEncoder.encode(safeFolderName, "UTF-8")
+                        + "&file=" + java.net.URLEncoder.encode(dataStr, "UTF-8");
 
                 DataOutputStream os = new DataOutputStream(conn.getOutputStream());
-                os.writeBytes(jsonParam.toString());
+                os.writeBytes(postParameters);
                 os.flush();
                 os.close();
 
@@ -221,10 +225,26 @@ public class RegisterActivity extends Activity {
                     // Cloudinary se URL mil gaya, ab Firebase bhejenge
                     runOnUiThread(() -> saveStudentToFirebase(secureUrl));
                 } else {
+                    // Agar 400 error aaya, toh Error Stream padh kar exact reason nikalenge
+                    BufferedReader errorStream = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+                    StringBuilder errorResponse = new StringBuilder();
+                    String line;
+                    while ((line = errorStream.readLine()) != null) {
+                        errorResponse.append(line);
+                    }
+                    errorStream.close();
+                    
+                    String errorMsg = "Status: " + responseCode;
+                    try {
+                        JSONObject errJson = new JSONObject(errorResponse.toString());
+                        errorMsg = errJson.getJSONObject("error").getString("message");
+                    } catch (Exception e) {}
+
+                    final String finalErrorMsg = errorMsg;
                     runOnUiThread(() -> {
                         btnSubmitReg.setText("Register   →");
                         btnSubmitReg.setEnabled(true);
-                        showCustomAlert("Cloudinary Upload Failed. Status: " + responseCode, true);
+                        showCustomAlert("Cloudinary Error: " + finalErrorMsg, true);
                     });
                 }
             } catch (Exception e) {
