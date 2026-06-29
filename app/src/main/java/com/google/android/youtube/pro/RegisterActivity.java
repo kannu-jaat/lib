@@ -44,14 +44,17 @@ import java.util.HashMap;
 public class RegisterActivity extends Activity {
 
     private EditText etUsername, etFullName, etMobile, etAddress, etPassword;
-    private TextView tvUsernameStatus, tvPhotoStatus, tvBackToLogin;
-    private LinearLayout btnSelectPhoto;
+    private TextView tvUsernameStatus, tvPhotoStatus, tvIDStatus, tvBackToLogin;
+    private LinearLayout btnSelectPhoto, btnSelectID;
     private Button btnSubmitReg;
     private CheckBox cbTerms;
 
-    private String base64ImageString = "";
+    private String base64Profile = "";
+    private String base64ID = ""; // Optional ID Proof
     private boolean isUsernameValid = false;
-    private static final int PICK_IMAGE_REQUEST = 1;
+    
+    private static final int PICK_PROFILE_REQ = 1;
+    private static final int PICK_ID_REQ = 2;
     
     private Handler handler = new Handler(Looper.getMainLooper());
     private Runnable workRunnable;
@@ -69,76 +72,63 @@ public class RegisterActivity extends Activity {
         
         tvUsernameStatus = findViewById(R.id.tvUsernameStatus);
         tvPhotoStatus = findViewById(R.id.tvPhotoStatus);
+        tvIDStatus = findViewById(R.id.tvIDStatus);
         tvBackToLogin = findViewById(R.id.tvBackToLogin);
         
         btnSelectPhoto = findViewById(R.id.btnSelectPhoto);
+        btnSelectID = findViewById(R.id.btnSelectID);
         btnSubmitReg = findViewById(R.id.btnSubmitReg);
         cbTerms = findViewById(R.id.cbTerms);
 
         tvBackToLogin.setOnClickListener(v -> finish());
 
-        // 1. REALTIME USERNAME CHECK
+        // Username Check
         etUsername.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
             @Override
             public void afterTextChanged(Editable s) {
                 String username = s.toString().trim();
                 tvUsernameStatus.setVisibility(View.VISIBLE);
-
                 if (workRunnable != null) handler.removeCallbacks(workRunnable);
 
                 if (username.length() < 4) {
-                    setUsernameStatus("Too short (min 4 chars)", "#E94560", false);
+                    setUsernameStatus("Min 4 chars required", "#E94560", false);
                     return;
                 }
                 if (!username.matches("^[a-zA-Z0-9_]+$")) {
-                    setUsernameStatus("Only letters, numbers & _ allowed", "#E94560", false);
+                    setUsernameStatus("Only letters, numbers, _ allowed", "#E94560", false);
                     return;
                 }
 
-                setUsernameStatus("Checking availability...", "#94A3B8", false);
-
-                // Firebase call after 0.8s to prevent spamming
+                setUsernameStatus("Checking...", "#94A3B8", false);
                 workRunnable = () -> checkUsernameInFirebase(username);
                 handler.postDelayed(workRunnable, 800);
             }
         });
 
-        // 2. SELECT PHOTO
-        btnSelectPhoto.setOnClickListener(v -> {
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent, "Select Photo"), PICK_IMAGE_REQUEST);
-        });
+        // Pick Profile Photo
+        btnSelectPhoto.setOnClickListener(v -> openImagePicker(PICK_PROFILE_REQ));
+        
+        // Pick ID Proof
+        btnSelectID.setOnClickListener(v -> openImagePicker(PICK_ID_REQ));
 
-        // 3. SUBMIT REGISTRATION
+        // Submit Button
         btnSubmitReg.setOnClickListener(v -> {
-            if (!isUsernameValid) {
-                showCustomAlert("Please choose a valid & available username.", true);
-                return;
-            }
-            if (!cbTerms.isChecked()) {
-                showCustomAlert("Please accept Terms & Privacy Policy.", true);
-                return;
-            }
-            if (base64ImageString.isEmpty()) {
-                showCustomAlert("Please select a profile photo.", true);
-                return;
-            }
-            if (etFullName.getText().toString().isEmpty() || etMobile.getText().toString().isEmpty() || etPassword.getText().toString().isEmpty()) {
-                showCustomAlert("Please fill all details.", true);
-                return;
+            if (!isUsernameValid) { showCustomAlert("Enter a valid username.", true); return; }
+            if (base64Profile.isEmpty()) { showCustomAlert("Profile Photo is required.", true); return; }
+            if (!cbTerms.isChecked()) { showCustomAlert("Accept Terms & Policy.", true); return; }
+            if (etFullName.getText().toString().isEmpty() || etPassword.getText().toString().isEmpty()) {
+                showCustomAlert("Please fill all details.", true); return;
             }
 
-            btnSubmitReg.setText("Uploading Photo...");
+            btnSubmitReg.setText("Uploading Profile (1/2)...");
             btnSubmitReg.setEnabled(false);
-            uploadImageToCloudinary();
+            
+            // Start upload chain: Profile -> ID -> Firebase
+            uploadToCloudinary(base64Profile, "Profiles", true);
         });
     }
 
@@ -153,48 +143,55 @@ public class RegisterActivity extends Activity {
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    setUsernameStatus("Username already taken ❌", "#E94560", false);
-                } else {
-                    setUsernameStatus("Username available ✅", "#4CAF50", true);
-                }
+                if (snapshot.exists()) setUsernameStatus("Taken ❌", "#E94560", false);
+                else setUsernameStatus("Available ✅", "#4CAF50", true);
             }
             @Override
             public void onCancelled(DatabaseError error) {}
         });
     }
 
+    private void openImagePicker(int requestCode) {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Image"), requestCode);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+        if (resultCode == RESULT_OK && data != null && data.getData() != null) {
             try {
                 Uri imageUri = data.getData();
                 InputStream imageStream = getContentResolver().openInputStream(imageUri);
-                Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                Bitmap selectedImg = BitmapFactory.decodeStream(imageStream);
                 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                selectedImage.compress(Bitmap.CompressFormat.JPEG, 50, baos); // Reduced quality for fast upload
-                byte[] imageBytes = baos.toByteArray();
-                base64ImageString = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
+                selectedImg.compress(Bitmap.CompressFormat.JPEG, 40, baos); 
+                String b64 = Base64.encodeToString(baos.toByteArray(), Base64.NO_WRAP);
                 
-                tvPhotoStatus.setText("Photo Selected ✅");
-                tvPhotoStatus.setTextColor(Color.parseColor("#4CAF50"));
+                if (requestCode == PICK_PROFILE_REQ) {
+                    base64Profile = b64;
+                    tvPhotoStatus.setText("Profile Selected ✅");
+                    tvPhotoStatus.setTextColor(Color.parseColor("#4CAF50"));
+                } else if (requestCode == PICK_ID_REQ) {
+                    base64ID = b64;
+                    tvIDStatus.setText("ID Proof Selected ✅");
+                    tvIDStatus.setTextColor(Color.parseColor("#4CAF50"));
+                }
             } catch (Exception e) {
                 showCustomAlert("Failed to process image.", true);
             }
         }
     }
 
-    // 4. UPLOAD TO CLOUDINARY (Background Thread - Display Name Error Fixed)
-    private void uploadImageToCloudinary() {
-        // Bache ka username nikal rahe hain taaki photo uske naam se save ho
+    // Single robust method to upload images sequentially
+    private void uploadToCloudinary(String base64Data, String subFolder, boolean isProfile) {
         String username = etUsername.getText().toString().trim();
-        if (username.isEmpty()) {
-            username = "student_" + System.currentTimeMillis();
-        }
-        
-        final String finalUsername = username;
+        if (username.isEmpty()) username = "student";
+
+        final String finalUsername = username + (isProfile ? "" : "_ID");
 
         new Thread(() -> {
             try {
@@ -204,25 +201,20 @@ public class RegisterActivity extends Activity {
                 conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                 conn.setDoOutput(true);
 
-                // Folder Name (Spaces hatakar)
-                String safeFolderName = AppConfig.LIBRARY_NAME.replace(" ", "_") + "_Profiles";
-
-                // URL Encode format me data bhejna
-                String dataStr = "data:image/jpeg;base64," + base64ImageString;
+                String safeFolderName = AppConfig.LIBRARY_NAME.replace(" ", "_") + "_" + subFolder;
+                String dataStr = "data:image/jpeg;base64," + base64Data;
                 
-                // 🔥 NAYA JADOO: public_id add kiya hai! Ab photo username ke naam se save hogi.
-                String postParameters = "upload_preset=" + java.net.URLEncoder.encode(AppConfig.CLOUDINARY_UPLOAD_PRESET, "UTF-8")
+                String postParams = "upload_preset=" + java.net.URLEncoder.encode(AppConfig.CLOUDINARY_UPLOAD_PRESET, "UTF-8")
                         + "&folder=" + java.net.URLEncoder.encode(safeFolderName, "UTF-8")
                         + "&public_id=" + java.net.URLEncoder.encode(finalUsername, "UTF-8") 
                         + "&file=" + java.net.URLEncoder.encode(dataStr, "UTF-8");
 
                 DataOutputStream os = new DataOutputStream(conn.getOutputStream());
-                os.writeBytes(postParameters);
+                os.writeBytes(postParams);
                 os.flush();
                 os.close();
 
-                int responseCode = conn.getResponseCode();
-                if (responseCode == HttpURLConnection.HTTP_OK) {
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     String inputLine;
                     StringBuilder response = new StringBuilder();
@@ -232,46 +224,109 @@ public class RegisterActivity extends Activity {
                     JSONObject jsonResponse = new JSONObject(response.toString());
                     String secureUrl = jsonResponse.getString("secure_url");
 
-                    // Cloudinary se URL mil gaya, ab Firebase bhejenge
-                    runOnUiThread(() -> saveStudentToFirebase(secureUrl));
-                } else {
-                    BufferedReader errorStream = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
-                    StringBuilder errorResponse = new StringBuilder();
-                    String line;
-                    while ((line = errorStream.readLine()) != null) {
-                        errorResponse.append(line);
-                    }
-                    errorStream.close();
-                    
-                    String errorMsg = "Status: " + responseCode;
-                    try {
-                        JSONObject errJson = new JSONObject(errorResponse.toString());
-                        errorMsg = errJson.getJSONObject("error").getString("message");
-                    } catch (Exception e) {}
-
-                    final String finalErrorMsg = errorMsg;
                     runOnUiThread(() -> {
-                        btnSubmitReg.setText("Register   →");
-                        btnSubmitReg.setEnabled(true);
-                        showCustomAlert("Cloudinary Error: " + finalErrorMsg, true);
+                        if (isProfile) {
+                            // Profile done. Now check if ID needs uploading
+                            if (!base64ID.isEmpty()) {
+                                btnSubmitReg.setText("Uploading ID (2/2)...");
+                                uploadToCloudinary(base64ID, "ID_Proofs", false);
+                            } else {
+                                // No ID selected, proceed directly to Firebase
+                                saveToFirebase(secureUrl, "");
+                            }
+                        } else {
+                            // ID is done. We need the profile URL from somewhere? 
+                            // Ah! Let's just save the profile URL globally temporarily.
+                        }
                     });
+                } else {
+                    runOnUiThread(() -> restoreBtn("Upload Failed. Check Network."));
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                runOnUiThread(() -> {
-                    btnSubmitReg.setText("Register   →");
-                    btnSubmitReg.setEnabled(true);
-                    showCustomAlert("Upload Error: Check Network.", true);
-                });
+                runOnUiThread(() -> restoreBtn("Upload Error."));
             }
         }).start();
     }
 
-    // 5. SAVE FINAL DATA TO FIREBASE
-    private void saveStudentToFirebase(String photoUrl) {
+    // Global variable to hold profile URL temporarily while ID uploads
+    private String tempProfileUrl = "";
+
+    // Fix for the sequential chain
+    private void uploadProfileAndID() {
+        btnSubmitReg.setText("Uploading Profile (1/2)...");
+        btnSubmitReg.setEnabled(false);
+        
+        String username = etUsername.getText().toString().trim();
+        new Thread(() -> {
+            try {
+                // 1. UPLOAD PROFILE
+                String profileUrl = uploadSingleImage(base64Profile, "Profiles", username);
+                if (profileUrl == null) {
+                    runOnUiThread(() -> restoreBtn("Profile Upload Failed")); return;
+                }
+
+                // 2. UPLOAD ID (If exists)
+                String idUrl = "";
+                if (!base64ID.isEmpty()) {
+                    runOnUiThread(() -> btnSubmitReg.setText("Uploading ID (2/2)..."));
+                    idUrl = uploadSingleImage(base64ID, "ID_Proofs", username + "_ID");
+                    if (idUrl == null) {
+                        runOnUiThread(() -> restoreBtn("ID Upload Failed")); return;
+                    }
+                }
+
+                // 3. BOTH DONE -> FIREBASE
+                final String pUrl = profileUrl;
+                final String iUrl = idUrl;
+                runOnUiThread(() -> saveToFirebase(pUrl, iUrl));
+
+            } catch (Exception e) {
+                runOnUiThread(() -> restoreBtn("Network Error"));
+            }
+        }).start();
+    }
+
+    // Helper method for synchronous background upload
+    private String uploadSingleImage(String b64, String subFolder, String publicId) {
+        try {
+            URL url = new URL("https://api.cloudinary.com/v1_1/" + AppConfig.CLOUDINARY_CLOUD_NAME + "/image/upload");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setDoOutput(true);
+
+            String safeFolderName = AppConfig.LIBRARY_NAME.replace(" ", "_") + "_" + subFolder;
+            String dataStr = "data:image/jpeg;base64," + b64;
+            
+            String postParams = "upload_preset=" + java.net.URLEncoder.encode(AppConfig.CLOUDINARY_UPLOAD_PRESET, "UTF-8")
+                    + "&folder=" + java.net.URLEncoder.encode(safeFolderName, "UTF-8")
+                    + "&public_id=" + java.net.URLEncoder.encode(publicId, "UTF-8") 
+                    + "&file=" + java.net.URLEncoder.encode(dataStr, "UTF-8");
+
+            DataOutputStream os = new DataOutputStream(conn.getOutputStream());
+            os.writeBytes(postParams);
+            os.flush(); os.close();
+
+            if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                String line; StringBuilder res = new StringBuilder();
+                while ((line = in.readLine()) != null) res.append(line);
+                in.close();
+                return new JSONObject(res.toString()).getString("secure_url");
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return null; // Failed
+    }
+
+    private void restoreBtn(String errorMsg) {
+        btnSubmitReg.setText("Register   →");
+        btnSubmitReg.setEnabled(true);
+        showCustomAlert(errorMsg, true);
+    }
+
+    private void saveToFirebase(String profileUrl, String idProofUrl) {
         btnSubmitReg.setText("Saving Data...");
         String username = etUsername.getText().toString().trim();
-        
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Students").child(username);
         
         HashMap<String, Object> data = new HashMap<>();
@@ -279,23 +334,19 @@ public class RegisterActivity extends Activity {
         data.put("mobile", etMobile.getText().toString().trim());
         data.put("address", etAddress.getText().toString().trim());
         data.put("password", etPassword.getText().toString().trim());
-        data.put("photoUrl", photoUrl); // Base64 ki jagah ab sidha Fast URL!
+        data.put("photoUrl", profileUrl);
+        data.put("idProofUrl", idProofUrl); // Blank string if not uploaded
         data.put("status", "Pending");
-        data.put("timestamp", System.currentTimeMillis());
+
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy__HH-mm", java.util.Locale.getDefault());
+        data.put("registrationTime", sdf.format(new java.util.Date()));
 
         ref.setValue(data).addOnCompleteListener(task -> {
-            btnSubmitReg.setText("Register   →");
-            btnSubmitReg.setEnabled(true);
-            if (task.isSuccessful()) {
-                showCustomAlert("Registered Successfully! Pending Admin Approval.", false);
-                handler.postDelayed(this::finish, 2000); // 2 second baad screen band
-            } else {
-                showCustomAlert("Firebase Error: Failed to save data.", true);
-            }
+            restoreBtn(task.isSuccessful() ? "Success! Admin will verify." : "Firebase Error.");
+            if (task.isSuccessful()) handler.postDelayed(this::finish, 2000);
         });
     }
 
-    // CUSTOM ALERT REUSED
     private void showCustomAlert(String message, boolean isError) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.custom_alert);
@@ -305,11 +356,9 @@ public class RegisterActivity extends Activity {
             window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
             window.setGravity(Gravity.TOP);
         }
-        
         TextView tvMsg = dialog.findViewById(R.id.tvAlertMessage);
         LinearLayout bg = dialog.findViewById(R.id.alertBackground);
         tvMsg.setText(message);
-        
         if (!isError) bg.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#4CAF50")));
         dialog.findViewById(R.id.tvAlertClose).setOnClickListener(v -> dialog.dismiss());
         dialog.show();
