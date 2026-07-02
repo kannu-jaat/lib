@@ -3,284 +3,263 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8FAFC">
-
-    <ScrollView
+    android:background="#F8FAFC"> <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottomNavLayout"
-        android:fillViewport="true">
+        android:orientation="vertical">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="240dp"
+            android:background="#0F172A">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/bg_library_banner"
+                android:alpha="0.55"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="240dp"
-                android:background="#0F172A">
+                android:layout_height="wrap_content"
+                android:padding="20dp">
+                
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@android:drawable/ic_menu_sort_by_size"
+                    android:tint="#FFFFFF"/>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cvHeaderAvatar"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:layout_alignParentRight="true"
+                    app:cardCornerRadius="22.5dp"
+                    app:cardElevation="2dp">
+                    <ImageView
+                        android:id="@+id/ivHeaderAvatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@android:drawable/ic_menu_camera"/>
+                </androidx.cardview.widget.CardView>
 
                 <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/bg_library_banner"
-                    android:alpha="0.45"/> <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="20dp">
-                    
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@android:drawable/ic_menu_sort_by_size"
-                        android:tint="#FFFFFF"/>
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/cvHeaderAvatar"
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"
-                        android:layout_alignParentRight="true"
-                        app:cardCornerRadius="22.5dp"
-                        app:cardElevation="4dp">
-                        <ImageView
-                            android:id="@+id/ivHeaderAvatar"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="centerCrop"
-                            android:src="@android:drawable/ic_menu_camera"/>
-                    </androidx.cardview.widget.CardView>
-
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:layout_toLeftOf="@id/cvHeaderAvatar"
-                        android:layout_marginRight="15dp"
-                        android:layout_marginTop="8dp"
-                        android:src="@android:drawable/ic_popup_reminder"
-                        android:tint="#FFFFFF"/>
-                </RelativeLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_alignParentBottom="true"
-                    android:paddingLeft="20dp"
-                    android:paddingRight="20dp"
-                    android:paddingBottom="45dp">
-
-                    <TextView
-                        android:id="@+id/tvGreeting"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Welcome back,"
-                        android:textColor="#E2E8F0"
-                        android:textSize="14sp"/>
-
-                    <TextView
-                        android:id="@+id/tvDashName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Loading..."
-                        android:textColor="#FBBF24"
-                        android:textSize="26sp"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Stay focused, stay consistent."
-                        android:textColor="#CBD5E1"
-                        android:textSize="12sp"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="12dp"/>
-
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:cardBackgroundColor="#1E293B"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp">
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:paddingLeft="12dp"
-                            android:paddingRight="12dp"
-                            android:paddingTop="6dp"
-                            android:paddingBottom="6dp">
-                            <View android:layout_width="8dp" android:layout_height="8dp" android:background="#10B981" android:layout_marginRight="8dp"/>
-                            <TextView android:id="@+id/tvMemberStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Active Member" android:textColor="#F8FAFC" android:textSize="12sp"/>
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-                </LinearLayout>
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_toLeftOf="@id/cvHeaderAvatar"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="8dp"
+                    android:src="@android:drawable/ic_popup_reminder"
+                    android:tint="#FFFFFF"/>
             </RelativeLayout>
 
-            <androidx.cardview.widget.CardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginTop="-25dp"
-                app:cardBackgroundColor="#1E1B4B"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="6dp">
-                
-                <LinearLayout
-                    android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_alignParentBottom="true"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="45dp">
+
+                <TextView
+                    android:id="@+id/tvGreeting"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp"
-                    android:baselineAligned="false">
-                    
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1.5" android:orientation="horizontal" android:gravity="center_vertical">
-                        <ImageView android:layout_width="32dp" android:layout_height="32dp" android:src="@android:drawable/btn_star_big_on" android:tint="#FBBF24" android:layout_marginRight="10dp"/>
-                        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Membership" android:textColor="#CBD5E1" android:textSize="10sp"/>
-                            <TextView android:id="@+id/tvMembershipType" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Premium" android:textColor="#FBBF24" android:textSize="16sp" android:textStyle="bold"/>
-                            <TextView android:id="@+id/tvValidity" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Valid till --" android:textColor="#94A3B8" android:textSize="9sp"/>
-                        </LinearLayout>
+                    android:text="Welcome back,"
+                    android:textColor="#E2E8F0"
+                    android:textSize="13sp"/>
+
+                <TextView
+                    android:id="@+id/tvDashName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Loading..."
+                    android:textColor="#FBBF24"
+                    android:textSize="24sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Stay focused, stay consistent."
+                    android:textColor="#CBD5E1"
+                    android:textSize="12sp"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginBottom="10dp"/>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="#1E293B"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp">
+                        <View android:layout_width="7dp" android:layout_height="7dp" android:background="#10B981" android:layout_marginRight="6dp"/>
+                        <TextView android:id="@+id/tvMemberStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Active Member" android:textColor="#F8FAFC" android:textSize="11sp"/>
                     </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+        </RelativeLayout>
 
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
-                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@android:drawable/ic_menu_today" android:tint="#FFFFFF"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="28" android:textColor="#FFFFFF" android:textSize="18sp" android:textStyle="bold" android:layout_marginTop="2dp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Days Present" android:textColor="#CBD5E1" android:textSize="9sp"/>
-                    </LinearLayout>
-
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
-                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@android:drawable/ic_menu_sort_by_size" android:tint="#FFFFFF"/>
-                        <TextView android:id="@+id/tvSeatNumber" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="A12" android:textColor="#FFFFFF" android:textSize="18sp" android:textStyle="bold" android:layout_marginTop="2dp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Seat No." android:textColor="#CBD5E1" android:textSize="9sp"/>
-                    </LinearLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Quick Access"
-                android:textColor="#0F172A"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="8dp"/>
-
-            <GridLayout
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="-25dp"
+            app:cardBackgroundColor="#1E1B4B"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="6dp">
+            
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:columnCount="4"
-                android:paddingLeft="12dp"
-                android:paddingRight="12dp">
+                android:orientation="horizontal"
+                android:padding="14dp"
+                android:baselineAligned="false">
                 
-                <LinearLayout android:id="@+id/btnGridMarkAttend" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:layout_margin="6dp" android:padding="12dp" android:background="@drawable/bg_badge_green" android:clickable="true" android:focusable="true">
-                    <ImageView android:layout_width="26dp" android:layout_height="26dp" android:src="@android:drawable/ic_menu_camera" android:tint="#10B981"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Mark\nAttend" android:textColor="#0F172A" android:textSize="11sp" android:gravity="center" android:layout_marginTop="6dp"/>
-                </LinearLayout>
-
-                <LinearLayout android:id="@+id/btnGridMyAttend" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:layout_margin="6dp" android:padding="12dp" android:background="@drawable/bg_input_neon" android:backgroundTint="#EFF6FF" android:clickable="true" android:focusable="true">
-                    <ImageView android:layout_width="26dp" android:layout_height="26dp" android:src="@android:drawable/ic_menu_today" android:tint="#3B82F6"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="My\nAttend" android:textColor="#0F172A" android:textSize="11sp" android:gravity="center" android:layout_marginTop="6dp"/>
-                </LinearLayout>
-
-                <LinearLayout android:id="@+id/btnGridMySeat" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:layout_margin="6dp" android:padding="12dp" android:background="@drawable/bg_input_neon" android:backgroundTint="#F3E8FF" android:clickable="true" android:focusable="true">
-                    <ImageView android:layout_width="26dp" android:layout_height="26dp" android:src="@android:drawable/ic_menu_view" android:tint="#A855F7"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="My Seat\nInfo" android:textColor="#0F172A" android:textSize="11sp" android:gravity="center" android:layout_marginTop="6dp"/>
-                </LinearLayout>
-
-                <LinearLayout android:id="@+id/btnGridFees" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:layout_margin="6dp" android:padding="12dp" android:background="@drawable/bg_input_neon" android:backgroundTint="#FFF7ED" android:clickable="true" android:focusable="true">
-                    <TextView android:layout_width="26dp" android:layout_height="26dp" android:text="₹" android:textColor="#F97316" android:textSize="20sp" android:textStyle="bold" android:gravity="center"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Fees &amp;\nPayment" android:textColor="#0F172A" android:textSize="11sp" android:gravity="center" android:layout_marginTop="6dp"/>
-                </LinearLayout>
-
-                <LinearLayout android:id="@+id/btnGridNotices" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:layout_margin="6dp" android:padding="12dp" android:background="@drawable/bg_input_neon" android:backgroundTint="#FEF2F2" android:clickable="true" android:focusable="true">
-                    <ImageView android:layout_width="26dp" android:layout_height="26dp" android:src="@android:drawable/ic_menu_info_details" android:tint="#EF4444"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Library\nNotices" android:textColor="#0F172A" android:textSize="11sp" android:gravity="center" android:layout_marginTop="6dp"/>
-                </LinearLayout>
-
-                <LinearLayout android:id="@+id/btnGridRules" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:layout_margin="6dp" android:padding="12dp" android:background="@drawable/bg_input_neon" android:backgroundTint="#F0FDFA" android:clickable="true" android:focusable="true">
-                    <ImageView android:layout_width="26dp" android:layout_height="26dp" android:src="@android:drawable/ic_menu_agenda" android:tint="#14B8A6"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Library\nRules" android:textColor="#0F172A" android:textSize="11sp" android:gravity="center" android:layout_marginTop="6dp"/>
-                </LinearLayout>
-
-                <LinearLayout android:id="@+id/btnGridProfile" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:layout_margin="6dp" android:padding="12dp" android:background="@drawable/bg_input_neon" android:backgroundTint="#EEF2FF" android:clickable="true" android:focusable="true">
-                    <ImageView android:layout_width="26dp" android:layout_height="26dp" android:src="@android:drawable/ic_menu_myplaces" android:tint="#6366F1"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="View\nProfile" android:textColor="#0F172A" android:textSize="11sp" android:gravity="center" android:layout_marginTop="6dp"/>
-                </LinearLayout>
-
-                <LinearLayout android:id="@+id/btnSupport" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:layout_margin="6dp" android:padding="12dp" android:background="@drawable/bg_input_neon" android:backgroundTint="#F0F9FF" android:clickable="true" android:focusable="true">
-                    <ImageView android:layout_width="26dp" android:layout_height="26dp" android:src="@android:drawable/ic_menu_call" android:tint="#0EA5E9"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Help &amp;\nSupport" android:textColor="#0F172A" android:textSize="11sp" android:gravity="center" android:layout_marginTop="6dp"/>
-                </LinearLayout>
-            </GridLayout>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="25dp"
-                app:cardBackgroundColor="#F0FDF4"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp">
-                
-                <RelativeLayout 
-                    android:layout_width="match_parent" 
-                    android:layout_height="wrap_content" 
-                    android:padding="20dp">
-                    
-                    <TextView 
-                        android:id="@+id/tvStatusTitle" 
-                        android:layout_width="wrap_content" 
-                        android:layout_height="wrap_content" 
-                        android:text="Today's Attendance Status" 
-                        android:textColor="#475569" 
-                        android:textSize="12sp"
-                        android:textStyle="bold"/>
-                    
-                    <TextView 
-                        android:id="@+id/tvTodayStatus" 
-                        android:layout_width="wrap_content" 
-                        android:layout_height="wrap_content" 
-                        android:layout_below="@id/tvStatusTitle" 
-                        android:text="Marked Successfully ✓" 
-                        android:textColor="#10B981" 
-                        android:textSize="20sp" 
-                        android:textStyle="bold" 
-                        android:layout_marginTop="4dp"/>
-                    
-                    <LinearLayout 
-                        android:layout_width="wrap_content" 
-                        android:layout_height="wrap_content" 
-                        android:layout_below="@id/tvTodayStatus" 
-                        android:layout_marginTop="8dp" 
-                        android:orientation="horizontal">
-                        
-                        <ImageView
-                            android:layout_width="14dp"
-                            android:layout_height="14dp"
-                            android:src="@android:drawable/ic_menu_today"
-                            android:tint="#64748B"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginRight="4dp"/>
-                            
-                        <TextView 
-                            android:id="@+id/tvAttendanceDate"
-                            android:layout_width="wrap_content" 
-                            android:layout_height="wrap_content" 
-                            android:text="Loading Date..." 
-                            android:textColor="#64748B" 
-                            android:textSize="12sp"/>
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1.5" android:orientation="horizontal" android:gravity="center_vertical">
+                    <ImageView android:layout_width="32dp" android:layout_height="32dp" android:src="@android:drawable/btn_star_big_on" android:tint="#FBBF24" android:layout_marginRight="8dp"/>
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Membership" android:textColor="#94A3B8" android:textSize="10sp"/>
+                        <TextView android:id="@+id/tvMembershipType" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Premium" android:textColor="#FBBF24" android:textSize="15sp" android:textStyle="bold"/>
+                        <TextView android:id="@+id/tvValidity" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Valid till 30 Dec 2026" android:textColor="#94A3B8" android:textSize="9sp"/>
                     </LinearLayout>
-                </RelativeLayout>
-            </androidx.cardview.widget.CardView>
-        </LinearLayout>
-    </ScrollView>
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                    <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@android:drawable/ic_menu_today" android:tint="#FFFFFF"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="28" android:textColor="#FFFFFF" android:textSize="16sp" android:textStyle="bold" android:layout_marginTop="2dp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Days Present" android:textColor="#94A3B8" android:textSize="9sp"/>
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                    <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@android:drawable/ic_menu_sort_by_size" android:tint="#FFFFFF"/>
+                    <TextView android:id="@+id/tvSeatNumber" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="A12" android:textColor="#FFFFFF" android:textSize="16sp" android:textStyle="bold" android:layout_marginTop="2dp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Seat No." android:textColor="#94A3B8" android:textSize="9sp"/>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quick Access"
+            android:textColor="#0F172A"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"/>
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="4"
+            android:paddingLeft="14dp"
+            android:paddingRight="14dp">
+            
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:layout_margin="6dp" android:padding="10dp" android:background="@drawable/bg_badge_green">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@android:drawable/ic_menu_camera" android:tint="#10B981"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Mark\nAttend" android:textColor="#0F172A" android:textSize="10sp" android:gravity="center" android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:layout_margin="6dp" android:padding="10dp" android:background="@drawable/bg_input_neon" android:backgroundTint="#EFF6FF">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@android:drawable/ic_menu_today" android:tint="#3B82F6"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="My\nAttend" android:textColor="#0F172A" android:textSize="10sp" android:gravity="center" android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:layout_margin="6dp" android:padding="10dp" android:background="@drawable/bg_input_neon" android:backgroundTint="#F3E8FF">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@android:drawable/ic_menu_view" android:tint="#A855F7"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="My Seat\n(A12)" android:textColor="#0F172A" android:textSize="10sp" android:gravity="center" android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:layout_margin="6dp" android:padding="10dp" android:background="@drawable/bg_input_neon" android:backgroundTint="#FFF7ED">
+                <TextView android:layout_width="24dp" android:layout_height="24dp" android:text="₹" android:textColor="#F97316" android:textSize="18sp" android:textStyle="bold" android:gravity="center"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Fees &amp;\nPayment" android:textColor="#0F172A" android:textSize="10sp" android:gravity="center" android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:layout_margin="6dp" android:padding="10dp" android:background="@drawable/bg_input_neon" android:backgroundTint="#FEF2F2">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@android:drawable/ic_menu_info_details" android:tint="#EF4444"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Notices" android:textColor="#0F172A" android:textSize="10sp" android:gravity="center" android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:layout_margin="6dp" android:padding="10dp" android:background="@drawable/bg_input_neon" android:backgroundTint="#F0FDFA">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@android:drawable/ic_menu_agenda" android:tint="#14B8A6"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rules" android:textColor="#0F172A" android:textSize="10sp" android:gravity="center" android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:layout_margin="6dp" android:padding="10dp" android:background="@drawable/bg_input_neon" android:backgroundTint="#EEF2FF">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@android:drawable/ic_menu_myplaces" android:tint="#6366F1"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Profile" android:textColor="#0F172A" android:textSize="10sp" android:gravity="center" android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnSupport"
+                android:layout_width="0dp" 
+                android:layout_height="wrap_content" 
+                android:layout_columnWeight="1" 
+                android:orientation="vertical" 
+                android:gravity="center" 
+                android:layout_margin="6dp" 
+                android:padding="10dp" 
+                android:background="@drawable/bg_input_neon" 
+                android:backgroundTint="#F0F9FF">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@android:drawable/ic_menu_call" android:tint="#0EA5E9"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Support" android:textColor="#0F172A" android:textSize="10sp" android:gravity="center" android:layout_marginTop="4dp"/>
+            </LinearLayout>
+        </GridLayout>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="#F0FDF4"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp">
+            
+            <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="16dp">
+                
+                <TextView android:id="@+id/tvStatusTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Today's Attendance" android:textColor="#0F172A" android:textSize="12sp"/>
+                <TextView android:id="@+id/tvTodayStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/tvStatusTitle" android:text="Marked ✓" android:textColor="#10B981" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="2dp"/>
+                
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/tvTodayStatus" android:layout_marginTop="8dp" android:orientation="horizontal">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="25 May 2026" android:textColor="#64748B" android:textSize="11sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="  •  09:15 AM" android:textColor="#64748B" android:textSize="11sp"/>
+                </LinearLayout>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    app:cardCornerRadius="27dp">
+                    <ImageView
+                        android:id="@+id/ivStatusAvatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@android:drawable/ic_menu_camera"/>
+                </androidx.cardview.widget.CardView>
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/bottomNavLayout"
@@ -296,40 +275,37 @@
             android:orientation="horizontal"
             android:paddingTop="6dp">
             
-            <LinearLayout android:id="@+id/btnNavHome" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal" android:clickable="true" android:focusable="true">
-                <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@android:drawable/ic_menu_view" android:tint="#FBBF24"/>
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Home" android:textColor="#FBBF24" android:textSize="10sp" android:layout_marginTop="2dp"/>
+            <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal">
+                <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@android:drawable/ic_menu_view" android:tint="#FBBF24"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dashboard" android:textColor="#FBBF24" android:textSize="10sp" android:layout_marginTop="3dp"/>
             </LinearLayout>
 
-            <LinearLayout android:id="@+id/btnNavAttend" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal" android:clickable="true" android:focusable="true">
-                <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@android:drawable/ic_menu_today" android:tint="#94A3B8"/>
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Attend" android:textColor="#94A3B8" android:textSize="10sp" android:layout_marginTop="2dp"/>
+            <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal">
+                <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@android:drawable/ic_menu_today" android:tint="#94A3B8"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Attend" android:textColor="#94A3B8" android:textSize="10sp" android:layout_marginTop="3dp"/>
             </LinearLayout>
 
             <View android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"/>
 
-            <LinearLayout android:id="@+id/btnNavPayments" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal" android:clickable="true" android:focusable="true">
-                <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@android:drawable/ic_menu_manage" android:tint="#94A3B8"/>
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Payments" android:textColor="#94A3B8" android:textSize="10sp" android:layout_marginTop="2dp"/>
+            <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal">
+                <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@android:drawable/ic_menu_manage" android:tint="#94A3B8"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Payments" android:textColor="#94A3B8" android:textSize="10sp" android:layout_marginTop="3dp"/>
             </LinearLayout>
 
-            <LinearLayout android:id="@+id/btnNavProfile" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal" android:clickable="true" android:focusable="true">
-                <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@android:drawable/ic_menu_myplaces" android:tint="#94A3B8"/>
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Profile" android:textColor="#94A3B8" android:textSize="10sp" android:layout_marginTop="2dp"/>
+            <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal">
+                <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@android:drawable/ic_menu_more" android:tint="#94A3B8"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="More" android:textColor="#94A3B8" android:textSize="10sp" android:layout_marginTop="3dp"/>
             </LinearLayout>
         </LinearLayout>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/btnFloatingScan"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_centerHorizontal="true"
             android:layout_alignParentTop="true"
             app:cardBackgroundColor="#F59E0B"
             app:cardCornerRadius="28dp"
-            app:cardElevation="6dp"
-            android:clickable="true"
-            android:focusable="true">
+            app:cardElevation="6dp">
             <ImageView
                 android:layout_width="26dp"
                 android:layout_height="26dp"
