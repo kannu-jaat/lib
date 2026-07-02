@@ -7,7 +7,9 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,7 +39,8 @@ public class DashboardActivity extends Activity {
     private LinearLayout btnSupport;
     private SharedPreferences prefs;
     private String savedUsername;
-    private Handler handler = new Handler(Looper.getMainLooper());
+    private ConnectivityManager.NetworkCallback networkCallback;
+    private ConnectivityManager cm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,12 +72,10 @@ public class DashboardActivity extends Activity {
         tvDashName.setText(cachedName);
         loadCachedProfileImage();
 
-        // CHECK NET AND FETCH DATA
-        if (!isNetworkAvailable()) {
-            showInternetWarning();
-        } else {
-            fetchDataFromFirebase();
-        }
+        // 🟢 LIVE INTERNET MONITORING SETUP
+        setupRealtimeInternetCheck();
+
+        fetchDataFromFirebase();
 
         btnSupport.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_DIAL);
@@ -83,28 +84,56 @@ public class DashboardActivity extends Activity {
         });
     }
 
+    // 🔥 LIVE NETWORK LISTENER LOGIC
+    private void setupRealtimeInternetCheck() {
+        cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        
+        // Initial Check (For App Startup)
+        if (cm != null && cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected()) {
+            tvInternetWarning.setVisibility(View.GONE);
+        } else {
+            tvInternetWarning.setVisibility(View.VISIBLE);
+        }
+
+        // Realtime Listener
+        NetworkRequest networkRequest = new NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build();
+
+        networkCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(Network network) {
+                // Internet is BACK
+                runOnUiThread(() -> tvInternetWarning.setVisibility(View.GONE));
+            }
+
+            @Override
+            public void onLost(Network network) {
+                // Internet is LOST
+                runOnUiThread(() -> tvInternetWarning.setVisibility(View.VISIBLE));
+            }
+        };
+
+        if (cm != null) {
+            cm.registerNetworkCallback(networkRequest, networkCallback);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Prevent memory leak
+        if (cm != null && networkCallback != null) {
+            cm.unregisterNetworkCallback(networkCallback);
+        }
+    }
+
     private void setDynamicGreeting() {
         Calendar c = Calendar.getInstance();
         int timeOfDay = c.get(Calendar.HOUR_OF_DAY);
         if (timeOfDay >= 0 && timeOfDay < 12) tvGreeting.setText("Welcome back,");
         else if (timeOfDay >= 12 && timeOfDay < 16) tvGreeting.setText("Good Afternoon,");
         else tvGreeting.setText("Good Evening,");
-    }
-
-    private boolean isNetworkAvailable() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm != null) {
-            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-            return activeNetwork != null && activeNetwork.isConnected();
-        }
-        return false;
-    }
-
-    private void showInternetWarning() {
-        if (tvInternetWarning != null) {
-            tvInternetWarning.setVisibility(View.VISIBLE);
-            handler.postDelayed(() -> tvInternetWarning.setVisibility(View.GONE), 3500);
-        }
     }
 
     private void loadCachedProfileImage() {
@@ -132,7 +161,7 @@ public class DashboardActivity extends Activity {
                         prefs.edit().putString("cachedName", fullName).apply();
                     }
                     if (seat != null && !seat.isEmpty()) tvSeatNumber.setText(seat);
-                    else tvSeatNumber.setText("N/A");
+                    else tvSeatNumber.setText("--");
 
                     if ("Approved".equals(status)) {
                         tvMembershipType.setText("Premium");
