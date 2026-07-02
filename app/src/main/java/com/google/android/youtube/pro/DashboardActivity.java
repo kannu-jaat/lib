@@ -6,14 +6,16 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,18 +32,19 @@ import java.util.Calendar;
 
 public class DashboardActivity extends Activity {
 
-    private TextView tvGreeting, tvDashName, tvSeatNumber, tvMembershipType;
+    private TextView tvGreeting, tvDashName, tvSeatNumber, tvMembershipType, tvInternetWarning;
     private ImageView ivHeaderAvatar, ivStatusAvatar;
     private LinearLayout btnSupport;
     private SharedPreferences prefs;
     private String savedUsername;
+    private Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dashboard);
 
-        // 1. Map UI Elements
+        tvInternetWarning = findViewById(R.id.tvInternetWarning);
         tvGreeting = findViewById(R.id.tvGreeting);
         tvDashName = findViewById(R.id.tvDashName);
         tvSeatNumber = findViewById(R.id.tvSeatNumber);
@@ -59,18 +62,20 @@ public class DashboardActivity extends Activity {
             return;
         }
 
-        // 2. Set Dynamic Greeting (Morning/Afternoon/Evening)
         setDynamicGreeting();
 
-        // 3. FAST PRELOAD: Load Cached Name & Photo Instantly (Zero Delay)
+        // INSTANT PRELOAD FROM CACHE
         String cachedName = prefs.getString("cachedName", "Student");
         tvDashName.setText(cachedName);
         loadCachedProfileImage();
 
-        // 4. FIREBASE CHECK: Background me nayi details check karo
-        fetchDataFromFirebase();
+        // CHECK NET AND FETCH DATA
+        if (!isNetworkAvailable()) {
+            showInternetWarning();
+        } else {
+            fetchDataFromFirebase();
+        }
 
-        // 5. SUPPORT BUTTON LOGIC (Dialer open karega)
         btnSupport.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_DIAL);
             intent.setData(Uri.parse("tel:" + AppConfig.CONTACT_NUMBER));
@@ -81,13 +86,24 @@ public class DashboardActivity extends Activity {
     private void setDynamicGreeting() {
         Calendar c = Calendar.getInstance();
         int timeOfDay = c.get(Calendar.HOUR_OF_DAY);
+        if (timeOfDay >= 0 && timeOfDay < 12) tvGreeting.setText("Welcome back,");
+        else if (timeOfDay >= 12 && timeOfDay < 16) tvGreeting.setText("Good Afternoon,");
+        else tvGreeting.setText("Good Evening,");
+    }
 
-        if (timeOfDay >= 0 && timeOfDay < 12) {
-            tvGreeting.setText("Good Morning,");
-        } else if (timeOfDay >= 12 && timeOfDay < 16) {
-            tvGreeting.setText("Good Afternoon,");
-        } else {
-            tvGreeting.setText("Good Evening,");
+    private boolean isNetworkAvailable() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            return activeNetwork != null && activeNetwork.isConnected();
+        }
+        return false;
+    }
+
+    private void showInternetWarning() {
+        if (tvInternetWarning != null) {
+            tvInternetWarning.setVisibility(View.VISIBLE);
+            handler.postDelayed(() -> tvInternetWarning.setVisibility(View.GONE), 3500);
         }
     }
 
@@ -111,29 +127,21 @@ public class DashboardActivity extends Activity {
                     String photoUrl = snapshot.child("photoUrl").getValue(String.class);
                     String status = snapshot.child("status").getValue(String.class);
 
-                    // Update Name if changed
                     if (fullName != null) {
                         tvDashName.setText(fullName);
                         prefs.edit().putString("cachedName", fullName).apply();
                     }
+                    if (seat != null && !seat.isEmpty()) tvSeatNumber.setText(seat);
+                    else tvSeatNumber.setText("N/A");
 
-                    // Admin assigned Seat Number
-                    if (seat != null && !seat.isEmpty()) {
-                        tvSeatNumber.setText(seat);
-                    } else {
-                        tvSeatNumber.setText("N/A");
-                    }
-
-                    // Admin assigned Membership (Simple Logic)
                     if ("Approved".equals(status)) {
                         tvMembershipType.setText("Premium");
-                        tvMembershipType.setTextColor(android.graphics.Color.parseColor("#FBBF24")); // Yellow
+                        tvMembershipType.setTextColor(android.graphics.Color.parseColor("#FBBF24"));
                     } else {
                         tvMembershipType.setText("Pending");
-                        tvMembershipType.setTextColor(android.graphics.Color.parseColor("#EF4444")); // Red
+                        tvMembershipType.setTextColor(android.graphics.Color.parseColor("#EF4444"));
                     }
 
-                    // 🔥 SMART IMAGE DOWNLOAD: Sirf tabhi download hogi jab URL naya ho!
                     String lastSavedUrl = prefs.getString("cachedImageUrl", "");
                     if (photoUrl != null && !photoUrl.isEmpty() && !photoUrl.equals(lastSavedUrl)) {
                         downloadAndCacheImage(photoUrl);
@@ -156,17 +164,13 @@ public class DashboardActivity extends Activity {
                 Bitmap myBitmap = BitmapFactory.decodeStream(input);
 
                 if (myBitmap != null) {
-                    // Save to local storage for future fast loading
                     File file = new File(getFilesDir(), "profile_avatar.jpg");
                     FileOutputStream fos = new FileOutputStream(file);
                     myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-                    fos.flush();
-                    fos.close();
+                    fos.flush(); fos.close();
 
-                    // Update SharedPreferences with new URL
                     prefs.edit().putString("cachedImageUrl", urlString).apply();
 
-                    // Update UI live
                     new Handler(Looper.getMainLooper()).post(() -> {
                         if (ivHeaderAvatar != null) ivHeaderAvatar.setImageBitmap(myBitmap);
                         if (ivStatusAvatar != null) ivStatusAvatar.setImageBitmap(myBitmap);
